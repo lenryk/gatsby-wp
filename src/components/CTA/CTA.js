@@ -6,11 +6,12 @@ import {
   CTAImageText,
   CTAImageTextWrapper,
 } from "./CTA.styles"
+import { GatsbyImage } from "gatsby-plugin-image"
 
 const CTA = ({ img, link, text }) => {
   return (
     <CTAImage>
-      <StyledImg image={img} alt="cta image" />
+      <GatsbyImage image={img} alt="cta image" />
       <Link to={link}>
         <CTAImageTextWrapper>
           <CTAImageText>{text}</CTAImageText>
