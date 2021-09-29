@@ -12,9 +12,70 @@ import {
   StyledDate,
   StyledReadMore,
 } from "./archive.styles"
+import ArchiveSidebar from "../components/ArchiveSidebar/ArchiveSidebar"
 
-const archiveTemplate = () => {
-  return <Layout></Layout>
+const archiveTemplate = ({
+  data: { allWpPost },
+  pageContext: { catId, catName, categories, numPages, currentPage },
+}) => {
+  return (
+    <Layout>
+      <StaticImage
+        src="../images/archive_headerimage.png"
+        placeholder="BLURRED"
+        maxWidth={1920}
+        maxHeight={300}
+        alt="Archive Hero"
+      />
+      <Wrapper>
+        <BreadCrumb parent={{ uri: "/blog/all-posts", title: "blog" }} />
+        <ContentWrapper>
+          <ArchiveSidebar catId={catId} categories={categories.edges} />
+          <PageContent>
+            <h1 dangerouslySetInnerHTML={{ __html: catName }} />
+            {allWpPost.edges.map(post => (
+              <article key={post.node.id} className="entry-content">
+                <Link to={`/blog${post.node.uri}`}>
+                  <StyledH2
+                    dangerouslySetInnerHTML={{ __html: post.node.title }}
+                  />
+                </Link>
+                <StyledDate
+                  dangerouslySetInnerHTML={{ __html: post.node.date }}
+                />
+                <p dangerouslySetInnerHTML={{ __html: post.node.excerpt }} />
+                <StyledReadMore to={`/blog${post.node.uri}`}>
+                  Read More
+                </StyledReadMore>
+                <div clasSNAme="dot-divider" />
+              </article>
+            ))}
+          </PageContent>
+        </ContentWrapper>
+      </Wrapper>
+    </Layout>
+  )
 }
 
 export default archiveTemplate
+
+export const pageQuery = graphql`
+  query ($catId: String!, $skip: Int!, $limit: Int!) {
+    allWpPost(
+      filter: { categories: { nodes: { elemMatch: { id: { eq: $catId } } } } }
+      skip: $skip
+      limit: $limit
+    ) {
+      edges {
+        node {
+          id
+          title
+          excerpt
+          uri
+          slug
+          date(formatString: "DD MM YYYY")
+        }
+      }
+    }
+  }
+`
